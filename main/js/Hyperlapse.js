@@ -238,7 +238,7 @@ var Hyperlapse = function (container, params) {
   };
 
   _loader.onPanoramaData = (data) => {
-    console.log(data);
+    // console.log(data);
   };
 
   /**
