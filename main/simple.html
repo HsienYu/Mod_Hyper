@@ -1,19 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <title>Simple Example</title>
 
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=<APIKEY>&callback=init"
+  <script async defer
+          src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDQHm8DRBgxkBWX81W4dWvjhbezpmT9OS8&callback=init"
           type="text/javascript"></script>
   <script src="js/three.min.js"></script>
   <script src="js/GSVPano.js"></script>
   <script src="js/Hyperlapse.js"></script>
   <script>
-
     function init() {
+      if (document.readyState !== 'complete') {
+        return;
+      }
 
-      var hyperlapse = new Hyperlapse(document.getElementById('pano'), {
+      console.log('start init');
+      let hyperlapse = new Hyperlapse(document.getElementById('pano'), {
         lookat: new google.maps.LatLng(37.81409525128964, -122.4775045005249),
         zoom: 1,
         use_lookat: false,
@@ -33,9 +37,9 @@
       };
 
       // Google Maps API stuff here...
-      var directions_service = new google.maps.DirectionsService();
+      let directions_service = new google.maps.DirectionsService();
 
-      var route = {
+      let route = {
         request: {
           origin: new google.maps.LatLng(25.038210072297254, 121.52914423832664),
           destination: new google.maps.LatLng(25.03786259637259, 121.55443828432074),
@@ -54,7 +58,6 @@
     }
 
     window.onload = init;
-
   </script>
 </head>
 

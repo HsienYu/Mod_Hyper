@@ -1,4 +1,25 @@
 var GSVPANO = GSVPANO || {};
+
+/**
+ *
+ * @param {Date} target
+ * @param {Array<{pano: string, Mo: Date}>} timePanos
+ */
+const getNearest = (target, timePanos) => {
+  let ty = target.getFullYear();
+  let tm = target.getMonth();
+  let dates = timePanos.map(x => {
+    return [x.Mo.getFullYear(), x.Mo.getMonth()];
+  });
+  let values = Array(dates.length);
+  for (let i = 0; i < dates.length; i++) {
+    const date = dates[i];
+    values[i] = Math.abs((date[1] - tm) + ((date[0] - ty) * 12));
+  }
+
+  return values.indexOf(Math.min(...values));
+};
+
 GSVPANO.PanoLoader = function (parameters) {
 
   'use strict';
@@ -27,13 +48,11 @@ GSVPANO.PanoLoader = function (parameters) {
   };
 
   this.throwError = function (message) {
-
     if (this.onError) {
       this.onError(message);
     } else {
       console.error(message);
     }
-
   };
 
   this.adaptTextureToZoom = function () {
@@ -97,6 +116,31 @@ GSVPANO.PanoLoader = function (parameters) {
 
   };
 
+  /**
+   * @param {Object} responseData
+   * @param {Date?} targetDate
+   * @return {{panoId: *, imageDate, time: Array<{pano: string, Mo: Date}>, centerHeading, originPitch}}
+   */
+  this.fetchPanoramaInfo = (responseData, targetDate) => {
+    let self = this;
+
+    let result = {
+      centerHeading: responseData.tiles.centerHeading,
+      originPitch: responseData.tiles.originPitch,
+      panoId: responseData.location.pano,
+      imageDate: responseData.imageDate,
+      /** @type {Array<{pano: string, Mo: Date}>} */
+      time: responseData.time,
+    };
+
+    if (targetDate) {
+      let nearestIdx = getNearest(targetDate, result.time);
+      result.panoId = result.time[nearestIdx].pano;
+    }
+
+    return result;
+  };
+
   this.load = function (location, callback) {
 
     console.log('Load for', location);
@@ -108,19 +152,22 @@ GSVPANO.PanoLoader = function (parameters) {
           self.onPanoramaData(result);
         }
 
-        rotation = result.tiles.centerHeading * Math.PI / 180.0;
-        pitch = result.tiles.originPitch;
-        copyright = result.copyright;
-        self.copyright = result.copyright;
-        _panoId = result.location.pano;
+        // TODO: input the target date
+        // let info = self.fetchPanoramaInfo(result, new Date(2014, 3));
+        let info = self.fetchPanoramaInfo(result);
+
+        rotation = info.centerHeading * Math.PI / 180.0;
+        pitch = info.originPitch;
+        copyright = info.copyright;
+        self.copyright = info.copyright;
+        _panoId = info.panoId;
         self.location = location;
         self.rotation = rotation;
         self.pitch = pitch;
-        self.image_date = result.imageDate;
+        self.image_date = info.imageDate;
         self.id = _panoId;
 
-        /** @type {{pano: string, MO: Date}} */
-        self.time = result.time;
+        self.time = info.time;
 
         callback();
       } else {
