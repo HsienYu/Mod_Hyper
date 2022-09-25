@@ -2,64 +2,64 @@
 <html>
 
 <head>
-	<title>Simple Example</title>
+  <title>Simple Example</title>
 
-	<script async defer src="https://maps.googleapis.com/maps/api/js?key=<APIKEY>&callback=init"
-		type="text/javascript"></script>
-	<script src="js/three.min.js"></script>
-	<script src="js/GSVPano.js"></script>
-	<script src="js/Hyperlapse.min.js"></script>
-	<script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=<APIKEY>&callback=init"
+          type="text/javascript"></script>
+  <script src="js/three.min.js"></script>
+  <script src="js/GSVPano.js"></script>
+  <script src="js/Hyperlapse.js"></script>
+  <script>
 
-		function init() {
+    function init() {
 
-			var hyperlapse = new Hyperlapse(document.getElementById('pano'), {
-				lookat: new google.maps.LatLng(37.81409525128964, -122.4775045005249),
-				zoom: 1,
-				use_lookat: false,
-				elevation: 50
-			});
+      var hyperlapse = new Hyperlapse(document.getElementById('pano'), {
+        lookat: new google.maps.LatLng(37.81409525128964, -122.4775045005249),
+        zoom: 1,
+        use_lookat: false,
+        elevation: 50,
+      });
 
-			hyperlapse.onError = function (e) {
-				console.log(e);
-			};
+      hyperlapse.onError = function (e) {
+        console.log(e);
+      };
 
-			hyperlapse.onRouteComplete = function (e) {
-				hyperlapse.load();
-			};
+      hyperlapse.onRouteComplete = function (e) {
+        hyperlapse.load();
+      };
 
-			hyperlapse.onLoadComplete = function (e) {
-				hyperlapse.play();
-			};
+      hyperlapse.onLoadComplete = function (e) {
+        hyperlapse.play();
+      };
 
-			// Google Maps API stuff here...
-			var directions_service = new google.maps.DirectionsService();
+      // Google Maps API stuff here...
+      var directions_service = new google.maps.DirectionsService();
 
-			var route = {
-				request: {
-					origin: new google.maps.LatLng(25.038210072297254, 121.52914423832664),
-					destination: new google.maps.LatLng(25.03786259637259, 121.55443828432074),
-					travelMode: google.maps.DirectionsTravelMode.DRIVING
-				}
-			};
+      var route = {
+        request: {
+          origin: new google.maps.LatLng(25.038210072297254, 121.52914423832664),
+          destination: new google.maps.LatLng(25.03786259637259, 121.55443828432074),
+          travelMode: google.maps.DirectionsTravelMode.DRIVING,
+        },
+      };
 
-			directions_service.route(route.request, function (response, status) {
-				if (status == google.maps.DirectionsStatus.OK) {
-					hyperlapse.generate({ route: response });
-				} else {
-					console.log(status);
-				}
-			});
+      directions_service.route(route.request, function (response, status) {
+        if (status == google.maps.DirectionsStatus.OK) {
+          hyperlapse.generate({ route: response });
+        } else {
+          console.log(status);
+        }
+      });
 
-		}
+    }
 
-		window.onload = init;
+    window.onload = init;
 
-	</script>
+  </script>
 </head>
 
 <body>
-	<div id="pano"></div>
+  <div id="pano"></div>
 </body>
 
 </html>
