@@ -1,7 +1,25 @@
-body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
-    Arial, sans-serif;
-  margin: auto;
-  max-width: 38rem;
-  padding: 2rem;
+#pano {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+}
+
+#map {
+  width: 400px;
+  height: 300px;
+  float: left;
+  padding: 0;
+}
+
+#progress {
+  width: 500px;
+  height: 120px;
+  float: left;
+  padding-top: 10px;
+  z-index: 0;
+  border-style: solid;
+  border-width: medium;
 }
