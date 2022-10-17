@@ -10,12 +10,28 @@ if (require('electron-squirrel-startup')) {
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    x: 0,
+    y: 0,
+    width: 1920,
+    height: 1200,
+    focusable: false,
+    transparent: false,
+    frame: true,
+    fullscreen: false,
+    alwaysOnTop: false,
+    skipTaskbar: false,
+    enableLargerThanScreen: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true,
+      contextIsolation: false,
+      nodeIntegrationInWorker: true,
+      webSecurity: false,
+      allowRunningInsecureContent: true
     },
   });
+
+  mainWindow.setSize(1920, 1080);
 
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
@@ -23,6 +39,11 @@ const createWindow = () => {
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
 };
+
+app.commandLine.appendSwitch('ignore-certificate-errors');
+
+//enable hardware acceleration
+app.disableHardwareAcceleration(false);
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
