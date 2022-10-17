@@ -5,7 +5,8 @@
 	<meta http-equiv="content-type" content="text/html; charset=UTF-8" />
 	<title>Viewer Example</title>
 
-	<script src="https://maps.googleapis.com/maps/api/js?key=<APIKEY>>&callback=init" type="text/javascript"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCc8LHLuwmZj2ZXoW5JCyq0umJKnzxaIxQ&callback=init"
+		type="text/javascript"></script>
 	<script src="js/dat.gui.min.js"></script>
 	<script src="js/three.min.js"></script>
 	<script src="js/GSVPano.js"></script>
@@ -14,7 +15,6 @@
 
 		var start_point = new google.maps.LatLng(44.3431, 6.783936);
 		var end_point = new google.maps.LatLng(44.340578, 6.782684);
-		var lookat_point = new google.maps.LatLng(44.34232747290594, 6.786460550292986);
 		var map, directions_renderer, directions_service, streetview_service, geocoder;
 		var start_pin, end_pin, pivot_pin, camera_pin;
 		var _elevation = 0;
@@ -29,7 +29,6 @@
 			if (window.location.hash) {
 				parts = window.location.hash.substr(1).split(',');
 				start_point = new google.maps.LatLng(parts[0], parts[1]);
-				lookat_point = new google.maps.LatLng(parts[2], parts[3]);
 				end_point = new google.maps.LatLng(parts[4], parts[5]);
 				_elevation = parts[6] || 0;
 			}
@@ -46,7 +45,6 @@
 
 			function changeHash() {
 				window.location.hash = start_pin.getPosition().lat() + ',' + start_pin.getPosition().lng() + ','
-					+ pivot_pin.getPosition().lat() + ',' + pivot_pin.getPosition().lng() + ','
 					+ end_pin.getPosition().lat() + ',' + end_pin.getPosition().lng() + ','
 					+ _elevation;
 			}
@@ -101,16 +99,7 @@
 				});
 			});
 
-			pivot_pin = new google.maps.Marker({
-				position: lookat_point,
-				draggable: true,
-				map: map
-			});
 
-			google.maps.event.addListener(pivot_pin, 'dragend', function (event) {
-				hyperlapse.setLookat(pivot_pin.getPosition());
-				changeHash();
-			});
 
 			function findAddress(address) {
 				geocoder.geocode({ 'address': address }, function (results, status) {
@@ -138,13 +127,11 @@
 			var onPointerDownPointerX = 0, onPointerDownPointerY = 0;
 
 			var hyperlapse = new Hyperlapse(pano, {
-				lookat: lookat_point,
 				fov: 80,
 				millis: 50,
 				width: window.innerWidth,
 				height: window.innerHeight,
 				zoom: 3,
-				use_lookat: true,
 				distance_between_points: 5,
 				max_points: 100,
 				elevation: _elevation
@@ -180,7 +167,6 @@
 				show("" +
 					"Start: " + start_pin.getPosition().toString() +
 					"<br>End: " + end_pin.getPosition().toString() +
-					"<br>Lookat: " + pivot_pin.getPosition().toString() +
 					"<br>Ready.");
 			};
 
@@ -188,7 +174,6 @@
 				show("" +
 					"Start: " + start_pin.getPosition().toString() +
 					"<br>End: " + end_pin.getPosition().toString() +
-					"<br>Lookat: " + pivot_pin.getPosition().toString() +
 					"<br>Position: " + (e.position + 1) + " of " + hyperlapse.length());
 				camera_pin.setPosition(e.point.location);
 			};
@@ -284,11 +269,8 @@
 
 					var center = map.getCenter();
 					var c1 = new google.maps.LatLng(center.lat(), center.lng() - spacing);
-					var c2 = new google.maps.LatLng(center.lat(), center.lng());
 					var c3 = new google.maps.LatLng(center.lat(), center.lng() + spacing);
 
-					hyperlapse.lookat = c2;
-					pivot_pin.setPosition(c2);
 
 					snapToRoad(c1, function (result1) {
 						start_pin.setPosition(result1);
@@ -367,10 +349,6 @@
 				hyperlapse.tilt = value;
 			});
 
-			var lookat_control = parameters.add(o, 'use_lookat')
-			lookat_control.onChange(function (value) {
-				hyperlapse.use_lookat = value;
-			});
 
 			parameters.open();
 
