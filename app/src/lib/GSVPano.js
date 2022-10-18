@@ -75,7 +75,7 @@ GSVPANO.PanoLoader = function (parameters) {
     if (_count === _total) {
       this.canvas = _canvas;
       if (this.onPanoramaLoad) {
-        await this.onPanoramaLoad(x, y);
+        await this.onPanoramaLoad();
       }
     }
   };

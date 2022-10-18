@@ -131,6 +131,7 @@ var Hyperlapse = function (container, params) {
     _position_x = 0, _position_y = 0,
     _is_playing = false, _is_loading = false,
     _point_index = 0,
+    _currentLoadTime = '',
     _origin_heading = 0, _origin_pitch = 0,
     _forward = true,
     _lookat_heading = 0, _lookat_elevation = 0,
@@ -224,6 +225,7 @@ var Hyperlapse = function (container, params) {
 
     _h_points[_point_index].image = canvas;
 
+    const idx = _point_index;
     /** @type {Blob} */
     const blob = await new Promise(
       (resolve) => canvas.toBlob(blob => resolve(blob), 'image/jpg', 0.8),
@@ -231,6 +233,8 @@ var Hyperlapse = function (container, params) {
     const buffer = await blob.arrayBuffer();
     window.electronAPI.saveImage({
       buffer: buffer,
+      time: _currentLoadTime,
+      idx: idx,
       x: x,
       y: y,
     });
@@ -767,7 +771,27 @@ var Hyperlapse = function (container, params) {
    */
   this.load = function () {
     _point_index = 0;
+    _currentLoadTime = this.getCurrentTimeStr();
     _loader.composePanorama(_h_points[_point_index].pano_id);
+  };
+
+  this.getCurrentTimeStr = () => {
+    let date_ob = new Date();
+    // current date
+    // adjust 0 before single digit date
+    let date = ('0' + date_ob.getDate()).slice(-2);
+    // current month
+    let month = ('0' + (date_ob.getMonth() + 1)).slice(-2);
+    // current year
+    let year = date_ob.getFullYear();
+    // current hours
+    let hours = date_ob.getHours();
+    // current minutes
+    let minutes = date_ob.getMinutes();
+    // current seconds
+    let seconds = date_ob.getSeconds();
+
+    return `${year}${month}${date}_${hours}${minutes}${seconds}`;
   };
 
   /**

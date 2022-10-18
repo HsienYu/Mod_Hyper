@@ -1,5 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require('path');
+
+const { homedir } = require('node:os');
+const path = require('node:path');
+const fs = require('node:fs/promises');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 // eslint-disable-next-line global-require
@@ -14,33 +17,38 @@ const createWindow = () => {
     y: 0,
     width: 1920,
     height: 1200,
-    focusable: false,
-    transparent: false,
-    frame: true,
-    fullscreen: false,
-    alwaysOnTop: false,
-    skipTaskbar: false,
-    enableLargerThanScreen: false,
+    // focusable: false,
+    // transparent: false,
+    // frame: true,
+    // fullscreen: false,
+    // alwaysOnTop: false,
+    // skipTaskbar: false,
+    // enableLargerThanScreen: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
-      nodeIntegration: true,
-      contextIsolation: true,
-      nodeIntegrationInWorker: true,
-      webSecurity: false,
-      allowRunningInsecureContent: true,
+      // nodeIntegration: true,
+      // contextIsolation: true,
+      // nodeIntegrationInWorker: true,
+      // webSecurity: false,
+      // allowRunningInsecureContent: true,
     },
   });
 
   mainWindow.setSize(1920, 1080);
 
+  const targetDir = path.join(homedir(), 'Downloads');
+  console.log(targetDir);
+
   /**
    * @param {IpcMainEvent} event
-   * @param {{buffer: ArrayBuffer, x: number, y: number}} data
+   * @param {{buffer: ArrayBuffer, time: string, idx: number, x: number, y: number}} data
    */
-  const saveImageHandler = (event, data) => {
-    console.log(data);
-    // todo: save to file
-    // todo: path of root folder?
+  const saveImageHandler = async (event, data) => {
+    const file = path.join(targetDir, `${data.time}_${String(data.idx).padStart(5, '0')}.jpg`);
+    console.log(`file: ${file}`);
+
+    const buffer = Buffer.from(data.buffer);
+    // await fs.writeFile(file, buffer, 'binary');
   };
 
   // ipc event
