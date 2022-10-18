@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
@@ -7,18 +7,14 @@
   <title>Mod Hyper</title>
   <link rel="stylesheet" href="index.css" />
 
-  <script src="https://maps.googleapis.com/maps/api/js?key={APIKEY}&callback=init" type="text/javascript"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key={APIKEY}" type="text/javascript"></script>
 
   <script src="./lib/dat.gui.min.js"></script>
   <script src="./lib/three.min.js"></script>
-  <script src="./lib/GSVPano.js"></script>
-  <script src="./lib/Hyperlapse.js"></script>
-  <script src="./app.js"></script>
-
 </head>
 
 <body>
-  <div id="pano""></div>
+  <div id="pano"></div>
   <div id=" controls">
     <div id="map"></div>
     <div id="controls" style="">
@@ -30,6 +26,10 @@
     <div id="text">
     </div>
   </div>
+
+  <script src="./lib/GSVPano.js"></script>
+  <script src="./lib/Hyperlapse.js"></script>
+  <script src="./app.js"></script>
 </body>
 
 </html>

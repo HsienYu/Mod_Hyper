@@ -65,29 +65,26 @@ GSVPANO.PanoLoader = function (parameters) {
     _ctx.scale(-1, 1);
   };
 
-  this.composeFromTile = function (x, y, texture) {
-
+  this.composeFromTile = async function (x, y, texture) {
     _ctx.drawImage(texture, x * 512, y * 512);
     _count++;
 
-    var p = Math.round(_count * 100 / _total);
+    let p = Math.round(_count * 100 / _total);
     this.setProgress(p);
 
     if (_count === _total) {
       this.canvas = _canvas;
       if (this.onPanoramaLoad) {
-        this.onPanoramaLoad();
+        await this.onPanoramaLoad(x, y);
       }
     }
-
   };
 
   this.composePanorama = function (panoId) {
-
     this.setProgress(0);
     console.log('Loading panorama for zoom ' + _zoom + '...');
 
-    var w = (_zoom == 3) ? 7 : Math.pow(2, _zoom),
+    let w = (_zoom == 3) ? 7 : Math.pow(2, _zoom),
       h = Math.pow(2, _zoom - 1),
       self = this,
       url,
@@ -101,19 +98,18 @@ GSVPANO.PanoLoader = function (parameters) {
       for (x = 0; x < w; x++) {
         url = 'https://maps.google.com/cbk?output=tile&panoid=' + panoId + '&zoom=' + _zoom + '&x=' + x + '&y=' + y + '&' + Date.now();
         (function (x, y) {
-          var img = new Image();
-          img.addEventListener('load', function () {
-            self.composeFromTile(x, y, this);
+          let img = new Image();
+          img.addEventListener('load', async function () {
+            await self.composeFromTile(x, y, this);
           });
-          img.addEventListener('error', function () {
-            self.composeFromTile(x, y, new Image());
+          img.addEventListener('error', async function () {
+            await self.composeFromTile(x, y, new Image());
           });
           img.crossOrigin = 'anonymous';
           img.src = url;
         })(x, y);
       }
     }
-
   };
 
   /**
@@ -142,9 +138,8 @@ GSVPANO.PanoLoader = function (parameters) {
   };
 
   this.load = function (location, callback) {
-
     console.log('Load for', location);
-    var self = this;
+    let self = this;
     _panoClient.getPanoramaByLocation(location, 50, function (result, status) {
       if (status === google.maps.StreetViewStatus.OK) {
 

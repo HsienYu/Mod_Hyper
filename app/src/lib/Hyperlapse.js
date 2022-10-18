@@ -215,16 +215,27 @@ var Hyperlapse = function (container, params) {
     handleError({ message: message });
   };
 
-  _loader.onPanoramaLoad = function () {
-    var canvas = document.createElement('canvas');
-    var context = canvas.getContext('2d');
+  _loader.onPanoramaLoad = async function (x, y) {
+    let canvas = document.createElement('canvas');
+    let context = canvas.getContext('2d');
     canvas.setAttribute('width', this.canvas.width);
     canvas.setAttribute('height', this.canvas.height);
     context.drawImage(this.canvas, 0, 0);
 
     _h_points[_point_index].image = canvas;
 
-    if (++_point_index != _h_points.length) {
+    /** @type {Blob} */
+    const blob = await new Promise(
+      (resolve) => canvas.toBlob(blob => resolve(blob), 'image/jpg', 0.8),
+    );
+    const buffer = await blob.arrayBuffer();
+    window.electronAPI.saveImage({
+      buffer: buffer,
+      x: x,
+      y: y,
+    });
+
+    if (++_point_index !== _h_points.length) {
       handleLoadProgress({ position: _point_index });
 
       if (!_cancel_load) {

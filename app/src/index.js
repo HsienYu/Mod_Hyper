@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -24,14 +24,27 @@ const createWindow = () => {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true,
-      contextIsolation: false,
+      contextIsolation: true,
       nodeIntegrationInWorker: true,
       webSecurity: false,
-      allowRunningInsecureContent: true
+      allowRunningInsecureContent: true,
     },
   });
 
   mainWindow.setSize(1920, 1080);
+
+  /**
+   * @param {IpcMainEvent} event
+   * @param {{buffer: ArrayBuffer, x: number, y: number}} data
+   */
+  const saveImageHandler = (event, data) => {
+    console.log(data);
+    // todo: save to file
+    // todo: path of root folder?
+  };
+
+  // ipc event
+  ipcMain.on('save-image', saveImageHandler);
 
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
