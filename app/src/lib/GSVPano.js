@@ -3,14 +3,14 @@ var GSVPANO = GSVPANO || {};
 /**
  *
  * @param {Date} target
- * @param {Array<{pano: string, Mo: Date}>} timePanos
+ * @param {Array<{pano: string, On: Date}>} timePanos
  */
 const getNearest = (target, timePanos) => {
   let ty = target.getFullYear();
   let tm = target.getMonth();
-  let dates = timePanos.map(x => {
-    return [x.Mo.getFullYear(), x.Mo.getMonth()];
-  });
+  let dates = timePanos?.map(x => {
+    return [x.On.getFullYear(), x.On.getMonth()];
+  }) ?? [];
   let values = Array(dates.length);
   for (let i = 0; i < dates.length; i++) {
     const date = dates[i];
@@ -118,8 +118,6 @@ GSVPANO.PanoLoader = function (parameters) {
    * @return {{panoId: *, imageDate, time: Array<{pano: string, Mo: Date}>, centerHeading, originPitch}}
    */
   this.fetchPanoramaInfo = (responseData, targetDate) => {
-    let self = this;
-
     let result = {
       centerHeading: responseData.tiles.centerHeading,
       originPitch: responseData.tiles.originPitch,
@@ -129,27 +127,31 @@ GSVPANO.PanoLoader = function (parameters) {
       time: responseData.time,
     };
 
-    if (targetDate) {
-      let nearestIdx = getNearest(targetDate, result.time);
+    if (!!targetDate) {
+      let nearestIdx = 0;
+      try {
+        nearestIdx = getNearest(targetDate, result.time);
+      } catch (e) {
+        console.error(e);
+      }
+
       result.panoId = result.time[nearestIdx].pano;
     }
 
     return result;
   };
 
-  this.load = function (location, callback) {
-    console.log('Load for', location);
+  this.load = function (location, targetDate, callback) {
+    console.log('Load for', location, targetDate?.toJSON());
     let self = this;
     _panoClient.getPanoramaByLocation(location, 50, function (result, status) {
       if (status === google.maps.StreetViewStatus.OK) {
-
         if (self.onPanoramaData) {
           self.onPanoramaData(result);
         }
 
-        // TODO: input the target date
-        // let info = self.fetchPanoramaInfo(result, new Date(2014, 3));
-        let info = self.fetchPanoramaInfo(result);
+        let info = self.fetchPanoramaInfo(result, targetDate);
+        // let info = self.fetchPanoramaInfo(result);
 
         rotation = info.centerHeading * Math.PI / 180.0;
         pitch = info.originPitch;

@@ -14,14 +14,14 @@ Number.prototype.toDeg = function () {
 
 // Array Remove - By John Resig (MIT Licensed)
 Array.prototype.remove = function (from, to) {
-  var rest = this.slice((to || from) + 1 || this.length);
+  let rest = this.slice((to || from) + 1 || this.length);
   this.length = from < 0 ? this.length + from : from;
   return this.push.apply(this, rest);
 };
 
-var pointOnLine = function (t, a, b) {
-  var lat1 = a.lat().toRad(), lon1 = a.lng().toRad();
-  var lat2 = b.lat().toRad(), lon2 = b.lng().toRad();
+let pointOnLine = function (t, a, b) {
+  let lat1 = a.lat().toRad(), lon1 = a.lng().toRad();
+  let lat2 = b.lat().toRad(), lon2 = b.lng().toRad();
 
   x = lat1 + t * (lat2 - lat1);
   y = lon1 + t * (lon2 - lon1);
@@ -43,10 +43,10 @@ var pointOnLine = function (t, a, b) {
  * @param {String} [params.copyright="© 2013 Google"]
  * @param {String} [params.image_date=""]
  */
-var HyperlapsePoint = function (location, pano_id, params) {
+let HyperlapsePoint = function (location, pano_id, params) {
 
-  var self = this;
-  var params = params || {};
+  let self = this;
+  params = params || {};
 
   /**
    * @type {google.maps.LatLng}
@@ -111,7 +111,7 @@ var HyperlapsePoint = function (location, pano_id, params) {
  * @param {Number} [params.elevation=0]
  * @param {Number} [params.tilt=0]
  */
-var Hyperlapse = function (container, params) {
+let Hyperlapse = function (container, params) {
 
   'use strict';
 
@@ -148,7 +148,7 @@ var Hyperlapse = function (container, params) {
    * @param {Object} e
    * @param {String} e.message
    */
-  var handleError = function (e) {
+  let handleError = function (e) {
     if (self.onError) self.onError(e);
   };
 
@@ -158,26 +158,26 @@ var Hyperlapse = function (container, params) {
    * @param {Number} e.position
    * @param {HyperlapsePoint} e.point
    */
-  var handleFrame = function (e) {
+  let handleFrame = function (e) {
     if (self.onFrame) self.onFrame(e);
   };
 
   /**
    * @event Hyperlapse#onPlay
    */
-  var handlePlay = function (e) {
+  let handlePlay = function (e) {
     if (self.onPlay) self.onPlay(e);
   };
 
   /**
    * @event Hyperlapse#onPause
    */
-  var handlePause = function (e) {
+  let handlePause = function (e) {
     if (self.onPause) self.onPause(e);
   };
 
-  var _elevator = new google.maps.ElevationService();
-  var _streetview_service = new google.maps.StreetViewService();
+  let _elevator = new google.maps.ElevationService();
+  let _streetview_service = new google.maps.StreetViewService();
 
   _canvas = document.createElement('canvas');
   _context = _canvas.getContext('2d');
@@ -189,10 +189,9 @@ var Hyperlapse = function (container, params) {
   _scene.add(_camera);
 
   // Check if we can use webGL
-  var isWebGL = function () {
+  let isWebGL = function () {
     try {
-      return !!window.WebGLRenderingContext
-        && !!document.createElement('canvas').getContext('experimental-webgl');
+      return !!window.WebGLRenderingContext && !!document.createElement('canvas').getContext('experimental-webgl');
     } catch (e) {
       console.log('WebGL not available starting with CanvasRenderer');
       return false;
@@ -203,10 +202,11 @@ var Hyperlapse = function (container, params) {
   _renderer.autoClearColor = false;
   _renderer.setSize(_w, _h);
 
-  _mesh = new THREE.Mesh(
-    new THREE.SphereGeometry(500, 60, 40),
-    new THREE.MeshBasicMaterial({ map: new THREE.Texture(), side: THREE.DoubleSide, overdraw: true }),
-  );
+  _mesh = new THREE.Mesh(new THREE.SphereGeometry(500, 60, 40), new THREE.MeshBasicMaterial({
+    map: new THREE.Texture(),
+    side: THREE.DoubleSide,
+    overdraw: true,
+  }));
   _scene.add(_mesh);
 
   _container.appendChild(_renderer.domElement);
@@ -227,16 +227,10 @@ var Hyperlapse = function (container, params) {
 
     const idx = _point_index;
     /** @type {Blob} */
-    const blob = await new Promise(
-      (resolve) => canvas.toBlob(blob => resolve(blob), 'image/jpg', 0.8),
-    );
+    const blob = await new Promise((resolve) => canvas.toBlob(blob => resolve(blob), 'image/jpg', 0.8));
     const buffer = await blob.arrayBuffer();
     window.electronAPI.saveImage({
-      buffer: buffer,
-      time: _currentLoadTime,
-      idx: idx,
-      x: x,
-      y: y,
+      buffer: buffer, time: _currentLoadTime, idx: idx, x: x, y: y,
     });
 
     if (++_point_index !== _h_points.length) {
@@ -259,7 +253,7 @@ var Hyperlapse = function (container, params) {
   /**
    * @event Hyperlapse#onLoadCanceled
    */
-  var handleLoadCanceled = function (e) {
+  let handleLoadCanceled = function (e) {
     _cancel_load = false;
     _is_loading = false;
 
@@ -271,14 +265,14 @@ var Hyperlapse = function (container, params) {
    * @param {Object} e
    * @param {Number} e.position
    */
-  var handleLoadProgress = function (e) {
+  let handleLoadProgress = function (e) {
     if (self.onLoadProgress) self.onLoadProgress(e);
   };
 
   /**
    * @event Hyperlapse#onLoadComplete
    */
-  var handleLoadComplete = function (e) {
+  let handleLoadComplete = function (e) {
     _is_loading = false;
     _point_index = 0;
 
@@ -292,7 +286,7 @@ var Hyperlapse = function (container, params) {
    * @param {Object} e
    * @param {HyperlapsePoint} e.point
    */
-  var handleRouteProgress = function (e) {
+  let handleRouteProgress = function (e) {
     if (self.onRouteProgress) self.onRouteProgress(e);
   };
 
@@ -302,20 +296,20 @@ var Hyperlapse = function (container, params) {
    * @param {google.maps.DirectionsResult} e.response
    * @param {Array<HyperlapsePoint>} e.points
    */
-  var handleRouteComplete = function (e) {
-    var elevations = [];
-    for (var i = 0; i < _h_points.length; i++) {
+  let handleRouteComplete = function (e) {
+    let elevations = [];
+    for (let i = 0; i < _h_points.length; i++) {
       elevations[i] = _h_points[i].location;
     }
 
     if (_use_elevation) {
       getElevation(elevations, function (results) {
         if (results) {
-          for (i = 0; i < _h_points.length; i++) {
+          for (let i = 0; i < _h_points.length; i++) {
             _h_points[i].elevation = results[i].elevation;
           }
         } else {
-          for (i = 0; i < _h_points.length; i++) {
+          for (let i = 0; i < _h_points.length; i++) {
             _h_points[i].elevation = -1;
           }
         }
@@ -325,7 +319,7 @@ var Hyperlapse = function (container, params) {
         });
       });
     } else {
-      for (i = 0; i < _h_points.length; i++) {
+      for (let i = 0; i < _h_points.length; i++) {
         _h_points[i].elevation = -1;
       }
 
@@ -336,14 +330,12 @@ var Hyperlapse = function (container, params) {
 
   };
 
-  var parsePoints = function (response) {
-
-    _loader.load(_raw_points[_point_index], function () {
-
-      if (_loader.id != _prev_pano_id) {
+  let parsePoints = function (response, targetDate) {
+    _loader.load(_raw_points[_point_index], targetDate, function () {
+      if (_loader.id !== _prev_pano_id) {
         _prev_pano_id = _loader.id;
 
-        var hp = new HyperlapsePoint(_loader.location, _loader.id, {
+        let hp = new HyperlapsePoint(_loader.location, _loader.id, {
           heading: _loader.rotation,
           pitch: _loader.pitch,
           elevation: _loader.elevation,
@@ -355,22 +347,20 @@ var Hyperlapse = function (container, params) {
 
         handleRouteProgress({ point: hp });
 
-        if (_point_index == _raw_points.length - 1) {
+        if (_point_index === _raw_points.length - 1) {
           handleRouteComplete({ response: response, points: _h_points });
         } else {
           _point_index++;
-          if (!_cancel_load) parsePoints(response);
-          else handleLoadCanceled({});
+          if (!_cancel_load) parsePoints(response); else handleLoadCanceled({});
         }
       } else {
 
         _raw_points.splice(_point_index, 1);
 
-        if (_point_index == _raw_points.length) {
+        if (_point_index === _raw_points.length) {
           handleRouteComplete({ response: response, points: _h_points }); // FIX
         } else {
-          if (!_cancel_load) parsePoints(response);
-          else handleLoadCanceled({});
+          if (!_cancel_load) parsePoints(response); else handleLoadCanceled({});
         }
 
       }
@@ -378,8 +368,8 @@ var Hyperlapse = function (container, params) {
     });
   };
 
-  var getElevation = function (locations, callback) {
-    var positionalRequest = { locations: locations };
+  let getElevation = function (locations, callback) {
+    let positionalRequest = { locations: locations };
 
     _elevator.getElevationForLocations(positionalRequest, function (results, status) {
       if (status == google.maps.ElevationStatus.OK) {
@@ -394,26 +384,26 @@ var Hyperlapse = function (container, params) {
     });
   };
 
-  var handleDirectionsRoute = function (response) {
+  let handleDirectionsRoute = function (response, targetDate) {
     if (!_is_playing) {
 
-      var route = response.routes[0];
-      var path = route.overview_path;
-      var legs = route.legs;
+      let route = response.routes[0];
+      let path = route.overview_path;
+      let legs = route.legs;
 
-      var total_distance = 0;
-      for (var i = 0; i < legs.length; ++i) {
+      let total_distance = 0;
+      for (let i = 0; i < legs.length; ++i) {
         total_distance += legs[i].distance.value;
       }
 
-      var segment_length = total_distance / _max_points;
+      let segment_length = total_distance / _max_points;
       _d = (segment_length < _distance_between_points) ? _d = _distance_between_points : _d = segment_length;
 
-      var d = 0;
-      var r = 0;
-      var a, b;
+      let d = 0;
+      let r = 0;
+      let a, b;
 
-      for (i = 0; i < path.length; i++) {
+      for (let i = 0; i < path.length; i++) {
         if (i + 1 < path.length) {
 
           a = path[i];
@@ -431,14 +421,14 @@ var Hyperlapse = function (container, params) {
           }
 
           if (r === 0) {
-            var segs = Math.floor(d / _d);
+            let segs = Math.floor(d / _d);
 
             if (segs > 0) {
-              for (var j = 0; j < segs; j++) {
-                var t = j / segs;
+              for (let j = 0; j < segs; j++) {
+                let t = j / segs;
 
                 if (t > 0 || (t + i) === 0) { // not start point
-                  var way = pointOnLine(t, a, b);
+                  let way = pointOnLine(t, a, b);
                   _raw_points.push(way);
                 }
               }
@@ -454,56 +444,53 @@ var Hyperlapse = function (container, params) {
         }
       }
 
-      parsePoints(response);
-
+      parsePoints(response, targetDate);
     } else {
       self.pause();
-      handleDirectionsRoute(response);
+      handleDirectionsRoute(response, targetDate);
     }
   };
 
-  var drawMaterial = function () {
+  let drawMaterial = function () {
     _mesh.material.map.image = _h_points[_point_index].image;
     _mesh.material.map.needsUpdate = true;
 
     _origin_heading = _h_points[_point_index].heading;
     _origin_pitch = _h_points[_point_index].pitch;
 
-    if (self.use_lookat)
-      _lookat_heading = google.maps.geometry.spherical.computeHeading(_h_points[_point_index].location, self.lookat);
+    if (self.use_lookat) _lookat_heading = google.maps.geometry.spherical.computeHeading(_h_points[_point_index].location, self.lookat);
 
-    if (_h_points[_point_index].elevation != -1) {
-      var e = _h_points[_point_index].elevation - self.elevation_offset;
-      var d = google.maps.geometry.spherical.computeDistanceBetween(_h_points[_point_index].location, self.lookat);
-      var dif = _lookat_elevation - e;
-      var angle = Math.atan(Math.abs(dif) / d).toDeg();
+    if (_h_points[_point_index].elevation !== -1) {
+      let e = _h_points[_point_index].elevation - self.elevation_offset;
+      let d = google.maps.geometry.spherical.computeDistanceBetween(_h_points[_point_index].location, self.lookat);
+      let dif = _lookat_elevation - e;
+      let angle = Math.atan(Math.abs(dif) / d).toDeg();
       _position_y = (dif < 0) ? -angle : angle;
     }
 
     handleFrame({
-      position: _point_index,
-      point: _h_points[_point_index],
+      position: _point_index, point: _h_points[_point_index],
     });
   };
 
-  var render = function () {
+  let render = function () {
     if (!_is_loading && self.length() > 0) {
-      var t = _point_index / (self.length());
+      let t = _point_index / (self.length());
 
-      var o_x = self.position.x + (self.offset.x * t);
-      var o_y = self.position.y + (self.offset.y * t);
-      var o_z = self.tilt + (self.offset.z.toRad() * t);
+      let o_x = self.position.x + (self.offset.x * t);
+      let o_y = self.position.y + (self.offset.y * t);
+      let o_z = self.tilt + (self.offset.z.toRad() * t);
 
-      var o_heading = (self.use_lookat) ? _lookat_heading - _origin_heading.toDeg() + o_x : o_x;
-      var o_pitch = _position_y + o_y;
+      let o_heading = (self.use_lookat) ? _lookat_heading - _origin_heading.toDeg() + o_x : o_x;
+      let o_pitch = _position_y + o_y;
 
-      var olon = _lon, olat = _lat;
+      let olon = _lon, olat = _lat;
       _lon = _lon + (o_heading - olon);
       _lat = _lat + (o_pitch - olat);
 
       _lat = Math.max(-85, Math.min(85, _lat));
-      var phi = (90 - _lat).toRad();
-      var theta = _lon.toRad();
+      let phi = (90 - _lat).toRad();
+      let theta = _lon.toRad();
 
       _camera.target.x = 500 * Math.sin(phi) * Math.cos(theta);
       _camera.target.y = 500 * Math.cos(phi);
@@ -519,8 +506,8 @@ var Hyperlapse = function (container, params) {
     }
   };
 
-  var animate = function () {
-    var ptime = _ctime;
+  let animate = function () {
+    let ptime = _ctime;
     _ctime = Date.now();
     _dtime += _ctime - ptime;
     if (_dtime >= self.millis) {
@@ -533,16 +520,16 @@ var Hyperlapse = function (container, params) {
   };
 
   // animates the playhead forward or backward depending on direction
-  var loop = function () {
+  let loop = function () {
     drawMaterial();
 
     if (_forward) {
-      if (++_point_index == _h_points.length) {
+      if (++_point_index === _h_points.length) {
         _point_index = _h_points.length - 1;
         _forward = !_forward;
       }
     } else {
-      if (--_point_index == -1) {
+      if (--_point_index === -1) {
         _point_index = 0;
         _forward = !_forward;
       }
@@ -682,17 +669,18 @@ var Hyperlapse = function (container, params) {
     self.lookat = point;
 
     if (_use_elevation && call_service) {
-      var e = getElevation([self.lookat], function (results) {
+      getElevation([self.lookat], function (results) {
         if (results) {
           _lookat_elevation = results[0].elevation;
         }
 
-        if (callback && callback.apply) callback();
+        if (callback && callback.apply) {
+          callback();
+        }
       });
     } else {
       if (callback && callback.apply) callback();
     }
-
   };
 
   /**
@@ -741,29 +729,27 @@ var Hyperlapse = function (container, params) {
   };
 
   /**
-   * @param {Object} parameters
-   * @param {Number} [parameters.distance_between_points]
-   * @param {Number} [parameters.max_points]
-   * @param {google.maps.DirectionsResult} parameters.route
+   * @param {Object} params
+   * @param {google.maps.DirectionsResult} params.route
+   * @param {Number} [params.distance_between_points]
+   * @param {Number} [params.max_points]
+   * @param {Date} [params.targetDate]
    */
   this.generate = function (params) {
-
     if (!_is_loading) {
       _is_loading = true;
       self.reset();
 
-      var p = params || {};
+      let p = params || {};
       _distance_between_points = p.distance_between_points || _distance_between_points;
       _max_points = p.max_points || _max_points;
 
       if (p.route) {
-        handleDirectionsRoute(p.route);
+        handleDirectionsRoute(p.route, p.targetDate);
       } else {
         console.log('No route provided.');
       }
-
     }
-
   };
 
   /**
