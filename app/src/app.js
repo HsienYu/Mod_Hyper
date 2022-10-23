@@ -1,5 +1,5 @@
-let start_point = new google.maps.LatLng(44.3431, 6.783936);
-let end_point = new google.maps.LatLng(44.340578, 6.782684);
+let start_point = new google.maps.LatLng(0, 0);
+let end_point = new google.maps.LatLng(0, 0);
 let map, directions_renderer, directions_service, streetview_service, geocoder;
 let start_pin, end_pin, pivot_pin, camera_pin;
 let _elevation = 0;
@@ -9,14 +9,48 @@ function show(msg) {
   document.getElementById('text').innerHTML = msg;
 }
 
-function init() {
-
-  if (window.location.hash) {
-    parts = window.location.hash.substr(1).split(',');
-    start_point = new google.maps.LatLng(parts[0], parts[1]);
-    end_point = new google.maps.LatLng(parts[4], parts[5]);
-    _elevation = parts[6] || 0;
+const registerPointInputEvent = (elementId, valueSetCallback) => {
+  let pointInput = document.getElementById(elementId);
+  if (!pointInput) {
+    console.error(`Can not found ${elementId}`);
+    return;
   }
+
+  pointInput.addEventListener('change', (evt) => {
+    let p = evt.currentTarget.value;
+    let parts = p.split(',').map((v) => v.trim());
+    if (valueSetCallback) {
+      valueSetCallback(new google.maps.LatLng(parts[0], parts[1]));
+    }
+  });
+};
+
+function init() {
+  // Add Point Input Event
+  registerPointInputEvent('inputStartPoint', resultPoint => {
+    console.log(`set start point ${resultPoint}`);
+
+    map.setCenter(resultPoint);
+
+    start_point = resultPoint;
+    start_pin.setPosition(resultPoint);
+    camera_pin.setPosition(resultPoint);
+    changeHash();
+  });
+
+  registerPointInputEvent('inputEndPoint', resultPoint => {
+    console.log(`set end point ${resultPoint}`);
+    end_point = resultPoint;
+    end_pin.setPosition(resultPoint);
+    changeHash();
+  });
+
+  // if (window.location.hash) {
+  //   parts = window.location.hash.substr(1).split(',');
+  //   start_point = new google.maps.LatLng(parts[0], parts[1]);
+  //   end_point = new google.maps.LatLng(parts[4], parts[5]);
+  //   _elevation = parts[6] || 0;
+  // }
 
   /* Map */
 
@@ -222,7 +256,7 @@ function init() {
           console.log('Input date', inputDate.toJSON());
           hyperlapse.generate({ route: response, targetDate: inputDate });
         } else {
-          console.log(status);
+          console.error(status);
         }
       });
     },
@@ -353,7 +387,8 @@ function init() {
     }
   }
 
-  theObj.generate();
+  // disable auto generate when start
+  // theObj.generate();
 }
 
 window.onload = init;
