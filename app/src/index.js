@@ -44,15 +44,26 @@ const createWindow = () => {
    * @param {{buffer: ArrayBuffer, time: string, idx: number, x: number, y: number}} data
    */
   const saveImageHandler = async (event, data) => {
-    const file = path.join(targetDir, `${data.time}_${String(data.idx).padStart(5, '0')}.jpg`);
-    console.log(`file: ${file}`);
+    return;
 
+    const file = path.join(targetDir, `${data.time}_${String(data.idx).padStart(5, '0')}.jpg`);
     const buffer = Buffer.from(data.buffer);
-    // await fs.writeFile(file, buffer, 'binary');
+    await fs.writeFile(file, buffer, 'binary');
+    console.log(`file: ${file} saved`);
+  };
+
+  const saveLookAtImageHandler = async (event, data) => {
+    return;
+
+    const file = path.join(targetDir, `lookAt_${data.time}_${String(data.idx).padStart(5, '0')}.jpg`);
+    const buffer = Buffer.from(data.buffer);
+    await fs.writeFile(file, buffer, 'binary');
+    console.log(`file: ${file} saved`);
   };
 
   // ipc event
   ipcMain.on('save-image', saveImageHandler);
+  ipcMain.on('save-lookAtImage', saveLookAtImageHandler);
 
   // and load the index.html of the app.
   mainWindow.loadFile(path.join(__dirname, 'index.html'));

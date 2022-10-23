@@ -6,4 +6,5 @@ const { contextBridge, ipcRenderer } = require('electron');
 console.log('setting preload');
 contextBridge.exposeInMainWorld('electronAPI', {
   saveImage: (data) => ipcRenderer.send('save-image', data),
+  saveLookAtImage: (data) => ipcRenderer.send('save-lookAtImage', data),
 });

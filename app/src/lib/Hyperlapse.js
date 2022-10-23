@@ -225,6 +225,7 @@ let Hyperlapse = function (container, params) {
 
     _h_points[_point_index].image = canvas;
 
+    // Store the origin image
     const idx = _point_index;
     /** @type {Blob} */
     const blob = await new Promise((resolve) => canvas.toBlob(blob => resolve(blob), 'image/jpg', 0.8));
@@ -242,7 +243,7 @@ let Hyperlapse = function (container, params) {
         handleLoadCanceled({});
       }
     } else {
-      handleLoadComplete({});
+      await handleLoadComplete({});
     }
   };
 
@@ -269,16 +270,47 @@ let Hyperlapse = function (container, params) {
     if (self.onLoadProgress) self.onLoadProgress(e);
   };
 
+  let storeLookAtImages = async () => {
+    let targetCanvas = document.getElementById('pano')
+      .getElementsByTagName('canvas')
+      .item(0);
+    if (!targetCanvas) {
+      console.error('Canvas not found.');
+      return;
+    }
+
+    _point_index = 0;
+    let endIndex = _h_points.length;
+    for (let i = 0; i < endIndex; i++) {
+      drawMaterial();
+      render();
+
+      const blob = await new Promise((resolve) => targetCanvas.toBlob(blob => resolve(blob), 'image/jpg', 0.8));
+      const buffer = await blob.arrayBuffer();
+      window.electronAPI.saveLookAtImage({
+        buffer: buffer, time: _currentLoadTime, idx: i, x: x, y: y,
+      });
+
+      _point_index++;
+    }
+  };
+
   /**
    * @event Hyperlapse#onLoadComplete
    */
-  let handleLoadComplete = function (e) {
+  let handleLoadComplete = async (e) => {
     _is_loading = false;
+
+    // Store all look at image
+    await storeLookAtImages();
+
     _point_index = 0;
 
     animate();
 
-    if (self.onLoadComplete) self.onLoadComplete(e);
+    if (self.onLoadComplete) {
+      self.onLoadComplete(e);
+    }
   };
 
   /**
@@ -451,22 +483,28 @@ let Hyperlapse = function (container, params) {
     }
   };
 
-  let drawMaterial = function () {
-    _mesh.material.map.image = _h_points[_point_index].image;
+  let drawMaterialFormInput = function (pointData) {
+    _mesh.material.map.image = pointData.image;
     _mesh.material.map.needsUpdate = true;
 
-    _origin_heading = _h_points[_point_index].heading;
-    _origin_pitch = _h_points[_point_index].pitch;
+    _origin_heading = pointData.heading;
+    _origin_pitch = pointData.pitch;
 
-    if (self.use_lookat) _lookat_heading = google.maps.geometry.spherical.computeHeading(_h_points[_point_index].location, self.lookat);
+    if (self.use_lookat) {
+      _lookat_heading = google.maps.geometry.spherical.computeHeading(pointData.location, self.lookat);
+    }
 
-    if (_h_points[_point_index].elevation !== -1) {
-      let e = _h_points[_point_index].elevation - self.elevation_offset;
-      let d = google.maps.geometry.spherical.computeDistanceBetween(_h_points[_point_index].location, self.lookat);
+    if (pointData.elevation !== -1) {
+      let e = pointData.elevation - self.elevation_offset;
+      let d = google.maps.geometry.spherical.computeDistanceBetween(pointData.location, self.lookat);
       let dif = _lookat_elevation - e;
       let angle = Math.atan(Math.abs(dif) / d).toDeg();
       _position_y = (dif < 0) ? -angle : angle;
     }
+  };
+
+  let drawMaterial = function () {
+    drawMaterialFormInput(_h_points[_point_index]);
 
     handleFrame({
       position: _point_index, point: _h_points[_point_index],
