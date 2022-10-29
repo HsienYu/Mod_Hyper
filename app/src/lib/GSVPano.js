@@ -6,18 +6,22 @@ var GSVPANO = GSVPANO || {};
  * @param {Array<{pano: string, On: Date}>} timePanos
  */
 const getNearest = (target, timePanos) => {
-  let ty = target.getFullYear();
-  let tm = target.getMonth();
-  let dates = timePanos?.map(x => {
-    return [x.On.getFullYear(), x.On.getMonth()];
-  }) ?? [];
-  let values = Array(dates.length);
-  for (let i = 0; i < dates.length; i++) {
-    const date = dates[i];
-    values[i] = Math.abs((date[1] - tm) + ((date[0] - ty) * 12));
-  }
+  try {
+    let ty = target.getFullYear();
+    let tm = target.getMonth();
+    let dates = timePanos?.map(x => {
+      return [x.On.getFullYear(), x.On.getMonth()];
+    }) ?? [];
+    let values = Array(dates.length);
+    for (let i = 0; i < dates.length; i++) {
+      const date = dates[i];
+      values[i] = Math.abs((date[1] - tm) + ((date[0] - ty) * 12));
+    }
 
-  return values.indexOf(Math.min(...values));
+    return values.indexOf(Math.min(...values));
+  } catch (e) {
+    return 0;
+  }
 };
 
 GSVPANO.PanoLoader = function (parameters) {
@@ -82,32 +86,31 @@ GSVPANO.PanoLoader = function (parameters) {
 
   this.composePanorama = function (panoId) {
     this.setProgress(0);
+    let self = this;
+
     console.log('Loading panorama for zoom ' + _zoom + '...');
 
-    let w = (_zoom == 3) ? 7 : Math.pow(2, _zoom),
-      h = Math.pow(2, _zoom - 1),
-      self = this,
-      url,
-      x,
-      y;
+    let w = (_zoom == 3) ? 7 : Math.pow(2, _zoom);
+    let h = Math.pow(2, _zoom - 1);
 
     _count = 0;
     _total = w * h;
 
-    for (y = 0; y < h; y++) {
-      for (x = 0; x < w; x++) {
-        url = 'https://maps.google.com/cbk?output=tile&panoid=' + panoId + '&zoom=' + _zoom + '&x=' + x + '&y=' + y + '&' + Date.now();
-        (function (x, y) {
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        let url = 'https://maps.google.com/cbk?output=tile&panoid=' + panoId + '&zoom=' + _zoom + '&x=' + x + '&y=' + y + '&' + Date.now();
+        (function (xx, yy, targetUrl) {
           let img = new Image();
+          img.crossOrigin = 'anonymous';
+          img.src = targetUrl;
+
           img.addEventListener('load', async function () {
-            await self.composeFromTile(x, y, this);
+            await self.composeFromTile(xx, yy, this);
           });
           img.addEventListener('error', async function () {
-            await self.composeFromTile(x, y, new Image());
+            await self.composeFromTile(xx, yy, new Image());
           });
-          img.crossOrigin = 'anonymous';
-          img.src = url;
-        })(x, y);
+        })(x, y, url);
       }
     }
   };
@@ -131,11 +134,11 @@ GSVPANO.PanoLoader = function (parameters) {
       let nearestIdx = 0;
       try {
         nearestIdx = getNearest(targetDate, result.time);
+        result.panoId = result.time[nearestIdx].pano;
       } catch (e) {
         console.error(e);
+        result.panoId = responseData.location.pano;
       }
-
-      result.panoId = result.time[nearestIdx].pano;
     }
 
     return result;
