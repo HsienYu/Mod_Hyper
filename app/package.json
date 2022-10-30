@@ -1,8 +1,8 @@
 {
   "name": "app",
-  "productName": "app",
+  "productName": "ModHyperion",
   "version": "1.0.0",
-  "description": "My Electron application description",
+  "description": "Google Street View capture tool",
   "main": "src/index.js",
   "scripts": {
     "start": "electron-forge start",
@@ -53,6 +53,7 @@
     "@electron-forge/maker-rpm": "^6.0.0-beta.67",
     "@electron-forge/maker-squirrel": "^6.0.0-beta.67",
     "@electron-forge/maker-zip": "^6.0.0-beta.67",
-    "electron": "21.1.1"
+    "electron": "21.1.1",
+    "electron-packager": "^17.0.0"
   }
 }
