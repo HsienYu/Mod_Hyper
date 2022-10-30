@@ -236,6 +236,7 @@ function init() {
     screen_width: window.innerWidth,
     screen_height: window.innerHeight,
     generate: function () {
+
       show('Generating route...');
 
       directions_renderer.setDirections({ routes: [] });
@@ -347,7 +348,7 @@ function init() {
     hyperlapse.tilt = value;
   });
 
-  parameters.open();
+  // parameters.open();
 
   let play_controls = gui.addFolder('play controls');
   play_controls.add(hyperlapse, 'play');

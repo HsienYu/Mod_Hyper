@@ -19,7 +19,34 @@
   height: 120px;
   float: left;
   padding-top: 10px;
-  z-index: 0;
+  z-index: 1;
   border-style: solid;
   border-width: medium;
+}
+
+#input_gui {
+  width: 400px;
+  height: 300px;
+  float: left;
+  padding: 0;
+  position: absolute;
+  top: 330px;
+  background-color: rgba(0, 0, 0, 0.957);
+  color: white;
+}
+
+#map_form {
+  padding: 10px;
+}
+
+#start_point {
+  padding: 10px;
+}
+
+#end_point {
+  padding: 10px;
+}
+
+#target_date {
+  padding: 10px;
 }

@@ -15,8 +15,8 @@ const createWindow = () => {
   const mainWindow = new BrowserWindow({
     x: 0,
     y: 0,
-    width: 1920,
-    height: 1200,
+    width: 1280,
+    height: 720,
     // focusable: false,
     // transparent: false,
     // frame: true,
@@ -34,28 +34,37 @@ const createWindow = () => {
     },
   });
 
-  mainWindow.setSize(1920, 1080);
+  mainWindow.setSize(1280, 720);
 
-  const targetDir = path.join(homedir(), 'Downloads');
+  const targetDir = path.join(homedir(), 'Movies');
   console.log(targetDir);
+  let temp_path = '';
 
   /**
    * @param {IpcMainEvent} event
    * @param {{buffer: ArrayBuffer, time: string, idx: number, x: number, y: number}} data
    */
   const saveImageHandler = async (event, data) => {
-    return;
+    // return;
+    let directoryPath = path.join(targetDir, data.time);
+    temp_path = directoryPath;
 
-    const file = path.join(targetDir, `${data.time}_${String(data.idx).padStart(5, '0')}.jpg`);
+    createDirectory(directoryPath).then((path) => {
+      console.log(`Successfully created directory: '${path}'`);
+    }).catch((error) => {
+      console.log(`Problem creating directory: ${error.message}`)
+    });
+
+    const file = path.join(directoryPath, `${data.time}_${String(data.idx).padStart(5, '0')}.jpg`);
     const buffer = Buffer.from(data.buffer);
     await fs.writeFile(file, buffer, 'binary');
     console.log(`file: ${file} saved`);
   };
 
   const saveLookAtImageHandler = async (event, data) => {
-    return;
+    // return;
 
-    const file = path.join(targetDir, `lookAt_${data.time}_${String(data.idx).padStart(5, '0')}.jpg`);
+    const file = path.join(temp_path, `lookAt_${data.time}_${String(data.idx).padStart(5, '0')}.jpg`);
     const buffer = Buffer.from(data.buffer);
     await fs.writeFile(file, buffer, 'binary');
     console.log(`file: ${file} saved`);
@@ -69,7 +78,7 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 };
 
 app.commandLine.appendSwitch('ignore-certificate-errors');
@@ -101,3 +110,27 @@ app.on('activate', () => {
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
+
+async function createDirectory(directoryPath) {
+  const directory = path.normalize(directoryPath);
+
+  return new Promise((resolve, reject) => {
+    fs.stat(directory, (error) => {
+      if (error) {
+        if (error.code === 'ENOENT') {
+          fs.mkdir(directory, (error) => {
+            if (error) {
+              reject(error);
+            } else {
+              resolve(directory);
+            }
+          });
+        } else {
+          reject(error);
+        }
+      } else {
+        resolve(directory);
+      }
+    });
+  });
+}

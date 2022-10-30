@@ -7,7 +7,8 @@
   <title>Mod Hyper</title>
   <link rel="stylesheet" href="index.css" />
 
-  <script src="https://maps.googleapis.com/maps/api/js?key={APIKEY}" type="text/javascript"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key={API_KEY}">
+    type = "text/javascript" ></script>
 
   <script src="./lib/dat.gui.min.js"></script>
   <script src="./lib/three.min.js"></script>
@@ -18,27 +19,31 @@
   <div id=" controls">
     <div id="map"></div>
     <div id="controls" style="">
-      <form id="map_form">
-        <input type="text" name="address" id="address" />
-        <button type="submit" id="searchButton">Search</button>
-      </form>
-      <br />
-      <div>
-        <label for="inputStartPoint">Start Point: </label>
-        <input type="text" id="inputStartPoint" />
+      <div id="input_gui">
+        <form id="map_form">
+          <input type="text" name="address" id="address" />
+          <button type="submit" id="searchButton">Search</button>
+        </form>
         <br />
+        <div id="start_point">
+          <label for="inputStartPoint">起點: </label>
+          <input type="text" id="inputStartPoint" />
+        </div>
         <br />
-        <label for="inputEndPoint">End Point: </label>
-        <input type="text" id="inputEndPoint" />
+        <div id="end_point">
+          <label for="inputEndPoint">終點: </label>
+          <input type="text" id="inputEndPoint" />
+        </div>
+        <br />
+        <div id="target_date">
+          <label for="targetDateInput">日期: </label>
+          <input type="date" id="targetDateInput" />
+        </div>
+        <br />
+        <div id="text">
+        </div>
       </div>
     </div>
-    <br />
-    <div>
-      <label for="targetDateInput">Target Date</label>
-      <input type="date" id="targetDateInput" />
-    </div>
-  </div>
-  <div id="text">
   </div>
   </div>
 
