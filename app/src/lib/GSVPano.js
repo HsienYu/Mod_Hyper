@@ -3,23 +3,25 @@ var GSVPANO = GSVPANO || {};
 /**
  *
  * @param {Date} target
- * @param {Array<{pano: string, On: Date}>} timePanos
+ * @param {Array<{pano: string, t: Date}>} timePanos
  */
 const getNearest = (target, timePanos) => {
   try {
     let ty = target.getFullYear();
     let tm = target.getMonth();
     let dates = timePanos?.map(x => {
-      return [x.On.getFullYear(), x.On.getMonth()];
+      return [x.t.getFullYear(), x.t.getMonth()];
     }) ?? [];
+
     let values = Array(dates.length);
     for (let i = 0; i < dates.length; i++) {
       const date = dates[i];
       values[i] = Math.abs((date[1] - tm) + ((date[0] - ty) * 12));
     }
-
-    return values.indexOf(Math.min(...values));
+    let resultIdx = values.indexOf(Math.min(...values));
+    return resultIdx === -1 ? 0 : resultIdx;
   } catch (e) {
+    console.error(e);
     return 0;
   }
 };
@@ -116,6 +118,34 @@ GSVPANO.PanoLoader = function (parameters) {
   };
 
   /**
+   *
+   * @param {Array} times
+   */
+  this.refactoringResponseTimes = (times) => {
+    if (!Array.isArray(times)) {
+      return [];
+    }
+
+    if (times.length === 0) {
+      return [];
+    }
+
+    let keys = Object.keys(times[0]);
+    keys = keys.filter(k => k !== 'pano');
+    let timeKey = keys[0];
+    if (!timeKey) {
+      return times;
+    }
+
+    return times.map(x => {
+      return {
+        pano: x.pano,
+        t: x[timeKey],
+      };
+    });
+  };
+
+  /**
    * @param {Object} responseData
    * @param {Date?} targetDate
    * @return {{panoId: *, imageDate, time: Array<{pano: string, Mo: Date}>, centerHeading, originPitch}}
@@ -133,7 +163,8 @@ GSVPANO.PanoLoader = function (parameters) {
     if (!!targetDate) {
       let nearestIdx = 0;
       try {
-        nearestIdx = getNearest(targetDate, result.time);
+        nearestIdx = getNearest(targetDate, this.refactoringResponseTimes(result.time));
+        console.log(`get ${nearestIdx} => ${JSON.stringify(result.time[nearestIdx])}`);
         result.panoId = result.time[nearestIdx].pano;
       } catch (e) {
         console.error(e);

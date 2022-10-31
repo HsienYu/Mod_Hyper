@@ -128,7 +128,7 @@ function init() {
   let targetDateInput = document.getElementById('targetDateInput');
   let getTargetDateFromInput = () => {
     if (!!targetDateInput.value) {
-      return new Date(targetDateInput.value);
+      return targetDateInput.valueAsDate;
     }
 
     return new Date();
