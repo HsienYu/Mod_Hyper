@@ -49,4 +49,9 @@
 
 #target_date {
   padding: 10px;
+  display: none;
+}
+
+#text {
+  padding: 10px;
 }

@@ -152,8 +152,9 @@ GSVPANO.PanoLoader = function (parameters) {
         if (self.onPanoramaData) {
           self.onPanoramaData(result);
         }
-
+        console.log(`date: ${targetDate}`);
         let info = self.fetchPanoramaInfo(result, targetDate);
+        console.log(`info: ${JSON.stringify(info)}`);
         // let info = self.fetchPanoramaInfo(result);
 
         rotation = info.centerHeading * Math.PI / 180.0;
