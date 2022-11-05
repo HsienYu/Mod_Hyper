@@ -85,7 +85,7 @@ let HyperlapsePoint = function (location, pano_id, params) {
    * @default "© 2013 Google"
    * @type {String}
    */
-  this.copyright = params.copyright || '© 2013 Google';
+  this.copyright = params.copyright || '';
 
   /**
    * @type {String}

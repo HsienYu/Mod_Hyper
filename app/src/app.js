@@ -359,7 +359,7 @@ function init() {
 
   gui.add(theObj, 'drop_pins');
   gui.add(theObj, 'generate');
-  gui.add(hyperlapse, 'load');
+  // gui.add(hyperlapse, 'load');
 
   window.addEventListener('resize', function () {
     hyperlapse.setSize(window.innerWidth, window.innerHeight);
